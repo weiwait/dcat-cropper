@@ -1,13 +1,17 @@
 # Dcat Admin Extension
 
 
+### 通过 composer 安装扩展
 ```shell
-  # 通过 composer 安装扩展
   composer require weiwait/dcat-cropper
-  
-  # 发布静态资源
+```
+### 发布静态资源
+```shell
   php artisan vendor:publish --tag=weiwait.dcat-cropper
-  # 更新 dcat-admin ide-helper
+```
+
+ ### 更新 dcat-admin ide-helper
+```shell
   php artisan admin:ide-helper
 ```
 
