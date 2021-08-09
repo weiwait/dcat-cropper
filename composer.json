@@ -1,0 +1,32 @@
+{
+    "name": "weiwait/dcat-cropper",
+    "alias": "",
+    "description": "Dcat-admin 表单单图裁剪",
+    "type": "library",
+    "keywords": ["dcat-admin", "extension", "裁剪", "图片裁剪"],
+    "homepage": "https://github.com/weiwait/dcat-cropper",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "weiwait",
+            "email": "mail@weiwait.cn"
+        }
+    ],
+    "require": {
+        "php": ">=7.1.0",
+        "dcat/laravel-admin": "~2.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Weiwait\\DcatCropper\\": "src/"
+        }
+    },
+    "extra": {
+        "dcat-admin": "Weiwait\\DcatCropper\\DcatCropperServiceProvider",
+        "laravel": {
+            "providers": [
+                "Weiwait\\DcatCropper\\DcatCropperServiceProvider"
+            ]
+        }
+    }
+}
