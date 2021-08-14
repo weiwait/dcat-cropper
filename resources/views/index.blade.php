@@ -5,7 +5,7 @@
     <div class="{{$viewClass['field']}}">
         @include('admin::form.error')
 
-        <div class="web-uploader {{ $fileType }}">
+        <div class="web-uploader clearfix {{ $fileType }}">
             <label id="{{$column}}-img-pick" style="display: none;">
                 <div class="img-thumbnail"
                      style="width: 200px; height: 200px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
@@ -20,8 +20,7 @@
                  style="cursor: pointer; float: left; display: none;"
                  id="{{$column}}-img-preview">
                 <img
-                    src=""
-                    alt="" style="max-height: 200px; min-height: 40px;">
+                    src="" style="max-height: 200px; min-height: 100px; min-width: 100px;">
             </div>
         </div>
 
@@ -164,66 +163,73 @@
                     this.cropper.destroy();
                 }
 
-                this.cropper = new Cropper(cropperImg[0], {
-                    ...this.dimensions,
-                    ready() {
-                        $('.cropper-btn-group button').off('click').click(e => {
-                            let current = $(e.currentTarget);
-                            current.addClass('active')
-                            current.siblings('button').removeClass('active')
+                new Promise((resolve, reject) => {
+                    cropperImg[0].onload = () => resolve()
+                    cropperImg[0].onerror = () => reject()
+                }).then(() => {
+                    this.cropper = new Cropper(cropperImg[0], {
+                        ...this.dimensions,
+                        ready() {
+                            $('.cropper-btn-group button').off('click').click(e => {
+                                let current = $(e.currentTarget);
+                                current.addClass('active')
+                                current.siblings('button').removeClass('active')
 
-                            $this.cropper.setDragMode(current.data('mode'))
-                        })
+                                $this.cropper.setDragMode(current.data('mode'))
+                            })
 
-                        $('.cropper-up').off('click').click(() => {
-                            $this.cropper.move(0, -10)
-                        })
+                            $('.cropper-up').off('click').click(() => {
+                                $this.cropper.move(0, -10)
+                            })
 
-                        $('.cropper-down').off('click').click(() => {
-                            $this.cropper.move(0, 10)
-                        })
+                            $('.cropper-down').off('click').click(() => {
+                                $this.cropper.move(0, 10)
+                            })
 
-                        $('.cropper-left').off('click').click(() => {
-                            $this.cropper.move(-10, 0)
-                        })
+                            $('.cropper-left').off('click').click(() => {
+                                $this.cropper.move(-10, 0)
+                            })
 
-                        $('.cropper-right').off('click').click(() => {
-                            $this.cropper.move(10, 0)
-                        })
+                            $('.cropper-right').off('click').click(() => {
+                                $this.cropper.move(10, 0)
+                            })
 
-                        $('.cropper-clear').off('click').click(() => {
-                            $('#{{$column}}-img-preview img').attr('src', '');
-                            $('#{{$column}}-img-preview').hide();
-                            $('#{{$column}}-img-pick').show()
+                            $('.cropper-clear').off('click').click(() => {
+                                $('#{{$column}}-img-preview img').attr('src', '');
+                                $('#{{$column}}-img-preview').hide();
+                                $('#{{$column}}-img-pick').show()
 
-                            $this.modal.modal('hide')
-                        })
+                                $this.modal.modal('hide')
+                            })
 
-                        $('.cropper-change').off('click').click(() => {
-                            $this.cropperInput.click()
-                        })
+                            $('.cropper-change').off('click').click(() => {
+                                $this.cropperInput.click()
+                            })
 
-                        $('.cropper-original').off('click').click(() => {
-                            $('#{{$column}}-img-preview img').attr('src', $this.imgData);
-                            $('#{{$column}}-img-pick').hide()
-                            $('#{{$column}}-img-preview').show()
+                            $('.cropper-original').off('click').click(() => {
+                                $('#{{$column}}-img-preview img').attr('src', $this.imgData);
+                                $('#{{$column}}-img-pick').hide()
+                                $('#{{$column}}-img-preview').show()
 
-                            $('input[name="{{$name}}"]').val(img)
+                                $('input[name="{{$name}}"]').val(img)
 
-                            $this.modal.modal('hide')
-                        })
+                                $this.modal.modal('hide')
+                            })
 
-                        $('.cropper-cropping').off('click').click(() => {
-                            let img = $this.cropper.getCroppedCanvas().toDataURL()
-                            $('#{{$column}}-img-preview img').attr('src', img);
-                            $('#{{$column}}-img-pick').hide()
-                            $('#{{$column}}-img-preview').show()
+                            $('.cropper-cropping').off('click').click(() => {
+                                let img = $this.cropper.getCroppedCanvas().toDataURL()
+                                $('#{{$column}}-img-preview img').attr('src', img);
+                                $('#{{$column}}-img-pick').hide()
+                                $('#{{$column}}-img-preview').show()
 
-                            $('input[name="{{$name}}"]').val(img)
+                                $('input[name="{{$name}}"]').val(img)
 
-                            $this.modal.modal('hide')
-                        })
-                    }
+                                $this.modal.modal('hide')
+                            })
+                        }
+                    })
+                }).catch(() => {
+                    Dcat.confirm('图片加载失败', '是否更换图片？', ()=>this.cropperInput.click(), ()=>this.modal.modal('hide'))
                 })
             }
         })();

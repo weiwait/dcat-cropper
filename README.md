@@ -1,5 +1,7 @@
 # Dcat Admin Extension
 
+### 演示地址
+[demo: http://dcat.weiwait.cn](http://dcat.weiwait.cn/admin/demo-croppers/create 'user: admin psw: admin')
 
 ### 通过 composer 安装扩展
 ```shell
