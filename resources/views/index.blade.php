@@ -91,7 +91,7 @@
 
                 this.dimensions = {
                     ...this.options.cropper,
-                    aspectRatio: this.options.dimensions.ratio ?? 1,
+                    aspectRatio: this.options.dimensions?.ratio ?? null,
                 }
 
                 if (this.options?.preview?.length > 0) {
