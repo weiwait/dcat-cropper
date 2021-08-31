@@ -23,6 +23,8 @@ class Cropper extends Image
 
         $this->destroyIfChanged($file);
 
+        $this->callInterventionMethods($this->getStorage()->path($file), $this->getStorage()->mimeType($file));
+
         return $file;
     }
 }
