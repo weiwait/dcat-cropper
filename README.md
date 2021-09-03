@@ -1,7 +1,7 @@
 # Dcat Admin Extension
 
 ### 演示地址
-[demo: http://dcat.weiwait.cn](http://dcat.weiwait.cn/admin/demo-croppers/create 'user: admin psw: admin')
+[demo: http://dcat.weiwait.cn (admin:admin)](http://dcat.weiwait.cn/admin/demo-distpickers/create 'user: admin psw: admin')
 
 ### 通过 composer 安装扩展
 ```shell
@@ -38,3 +38,4 @@
 ### Dcat-admin 扩展列表
 1. [单图裁剪](https://github.com/weiwait/dcat-cropper)
 2. [区划级联+坐标拾取](https://github.com/weiwait/dcat-cropper)
+3. [smtp快速便捷配置](https://github.com/weiwait/dcat-smtp)
