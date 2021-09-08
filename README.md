@@ -39,3 +39,4 @@
 1. [单图裁剪](https://github.com/weiwait/dcat-cropper)
 2. [区划级联+坐标拾取](https://github.com/weiwait/dcat-distpicker)
 3. [smtp快速便捷配置](https://github.com/weiwait/dcat-smtp)
+4. [sms channel 快速便捷配置](https://github.com/weiwait/dcat-easy-sms)
