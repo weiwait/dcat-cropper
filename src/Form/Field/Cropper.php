@@ -19,11 +19,11 @@ class Cropper extends Image
             $file = config('admin.upload.directory.image') . '/' . md5(Str::uuid()) . '.' . $ext;
 
             $this->getStorage()->put($file, $image);
+
+            $this->callInterventionMethods($this->getStorage()->path($file), $this->getStorage()->mimeType($file));
         }
 
         $this->destroyIfChanged($file);
-
-        $this->callInterventionMethods($this->getStorage()->path($file), $this->getStorage()->mimeType($file));
 
         return $file;
     }
