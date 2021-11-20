@@ -20,6 +20,11 @@
 ```php
     $form->cropper('column', 'label')
         ->ratio(16/9) // 快捷裁剪选项配置（裁剪比率）
+        ->resolution(1920, 1080)
+        ->ratio(1)
+        ->resolution(100) // 等比
+        ->ratio(['1:1' => 1, '16:9' => 16/9, '自定义' => null]) // 多预设
+        ->resolution(['1:1' => [300, 300], '16:9' => [1920, 1080]]);
         ->options([
             // https://github.com/fengyuanchen/cropperjs
             // 裁剪选项
