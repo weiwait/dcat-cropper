@@ -27,4 +27,41 @@ class Cropper extends Image
 
         return $file;
     }
+
+    /**
+     * @param float|array $ratio
+     * @return Cropper
+     */
+    public function ratio($ratio): Cropper
+    {
+        if (empty($ratio)) return $this;
+
+        if (is_numeric($ratio)) {
+            return parent::ratio($ratio);
+        }
+
+        if (is_array($ratio)) {
+            $this->mergeOptions(['dimensions' => ['ratio' => $ratio]]);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param int | array $width
+     * @param null $height
+     * @return $this
+     */
+    public function resolution($width, $height = null): Cropper
+    {
+        if (!is_array($width)) {
+            $width = [
+                'default' => [$width, $height ?: $width]
+            ];
+        }
+
+        $this->mergeOptions(['resolution' => $width]);
+
+        return $this;
+    }
 }

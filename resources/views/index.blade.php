@@ -65,6 +65,14 @@
                     <button type="button" class="btn btn-info cropper-original">原图</button>
                     <button type="button" class="btn btn-info cropper-cropping">裁剪</button>
                 </div>
+
+                <div class="dropdown" id="{{$column}}-cropper-ratios">
+                    <button class="btn btn-info dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-expanded="false">
+                        比例
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -82,6 +90,7 @@
             container;
             preview;
             dimensions = {};
+            ratios = {};
 
             constructor() {
                 this.cropperInput = $("#{{$name}}-file-input");
@@ -91,7 +100,7 @@
 
                 this.dimensions = {
                     ...this.options.cropper,
-                    aspectRatio: this.options.dimensions?.ratio ?? null,
+                    aspectRatio: this.resoleRatio(this.options.dimensions?.ratio),
                 }
 
                 if (this.options?.preview?.length > 0) {
@@ -146,6 +155,37 @@
                         this.is_modal ? this.cropping() : this.modal.modal('show')
                     }
                 })
+            }
+
+            resoleRatio(ratio) {
+                if (!ratio) {
+                    return null
+                }
+
+                if (ratio instanceof Object) {
+                    this.ratios = ratio
+
+                    $('#{{$column}}-cropper-ratios').show()
+                    $('#{{$column}}-cropper-ratios button').text(Object.keys(ratio)[0])
+
+                    Object.keys(ratio).forEach(key => {
+                        $('#{{$column}}-cropper-ratios .dropdown-menu').append(`
+                            <div class="dropdown-item" style="padding: 5px 10px">${key}</div>
+                        `)
+                    })
+
+                    $('#{{$column}}-cropper-ratios .dropdown-item').click(e => {
+                        this.dimensions.aspectRatio = this.ratios[$(e.target).text().trim()]
+                        $('#{{$column}}-cropper-ratios button').text($(e.target).text().trim())
+
+                        this.cropper.setAspectRatio(this.dimensions.aspectRatio)
+                    })
+
+                    return Object.values(ratio)[0]
+                }
+
+                $('#{{$column}}-cropper-ratios').hide()
+                return ratio
             }
 
             cropping () {
@@ -217,7 +257,26 @@
                             })
 
                             $('.cropper-cropping').off('click').click(() => {
-                                let img = $this.cropper.getCroppedCanvas().toDataURL()
+                                let resolution = {}
+                                if ($this.options.resolution) {
+                                    if (Object.keys($this.ratios).length === 0) {
+                                        resolution = {
+                                            width: $this.options.resolution.default[0],
+                                            height: $this.options.resolution.default[1],
+                                        }
+                                    } else {
+                                        let currentRatio = $('#{{$column}}-cropper-ratios button').text().trim()
+
+                                        if ($this.options.resolution[currentRatio]?.length === 2) {
+                                            resolution = {
+                                                width: $this.options.resolution[currentRatio][0],
+                                                height: $this.options.resolution[currentRatio][1],
+                                            }
+                                        }
+                                    }
+                                }
+
+                                let img = $this.cropper.getCroppedCanvas(resolution).toDataURL()
                                 $('#{{$column}}-img-preview img').attr('src', img);
                                 $('#{{$column}}-img-pick').hide()
                                 $('#{{$column}}-img-preview').show()

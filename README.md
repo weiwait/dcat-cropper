@@ -32,8 +32,9 @@
 
 ![示例图片](https://github.com/weiwait/images/blob/main/dcat-cropper.png?raw=true)
 
-### Donate
-![示例图片](https://github.com/weiwait/images/blob/main/donate.png?raw=true)
+[comment]: <> (### Donate)
+
+[comment]: <> (![示例图片]&#40;https://github.com/weiwait/images/blob/main/donate.png?raw=true&#41;)
 
 ### Dcat-admin 扩展列表
 1. [单图裁剪](https://github.com/weiwait/dcat-cropper)
