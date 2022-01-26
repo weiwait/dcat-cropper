@@ -251,7 +251,7 @@
                                 $('#{{$column}}-img-pick').hide()
                                 $('#{{$column}}-img-preview').show()
 
-                                $('input[name="{{$name}}"]').val(img)
+                                $('input[name="{{$name}}"]').val($this.imgData)
 
                                 $this.modal.modal('hide')
                             })
