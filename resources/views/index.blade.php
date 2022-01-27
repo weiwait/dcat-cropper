@@ -154,6 +154,8 @@
 
                         this.is_modal ? this.cropping() : this.modal.modal('show')
                     }
+
+                    e.currentTarget.value = '';
                 })
             }
 
