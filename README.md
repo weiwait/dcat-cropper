@@ -9,7 +9,7 @@
 ```
 ### 发布静态资源
 ```shell
-  php artisan vendor:publish --tag=weiwait.dcat-cropper
+  php artisan vendor:publish --tag=weiwait.dcat-cropper --force
 ```
 
  ### 更新 dcat-admin ide-helper
@@ -24,7 +24,7 @@
         ->ratio(1)
         ->resolution(100) // 等比
         ->ratio(['1:1' => 1, '16:9' => 16/9, '自定义' => null]) // 多预设
-        ->resolution(['1:1' => [300, 300], '16:9' => [1920, 1080]]);
+        ->resolution(['1:1' => [300, 300], '16:9' => [1920, 1080]])
         ->options([
             // https://github.com/fengyuanchen/cropperjs
             // 裁剪选项
@@ -33,6 +33,24 @@
                 'background' => false,
             ]   
         ])
+    
+    $form->multipleCropper('column', 'label')
+        ->ratio(16/9) // 快捷裁剪选项配置（裁剪比率）
+        ->resolution(1920, 1080)
+        ->ratio(1)
+        ->resolution(100) // 等比
+        ->ratio(['1:1' => 1, '16:9' => 16/9, '自定义' => null]) // 多预设
+        ->resolution(['1:1' => [300, 300], '16:9' => [1920, 1080]])
+        ->options([
+            // https://github.com/fengyuanchen/cropperjs
+            // 裁剪选项
+            'cropper' => [
+                'aspectRatio' = 16/9,
+                'background' => false,
+            ]   
+        ])
+        ->accept('png')
+        ->compress() // intervention/image 功能（dcat）
 ```
 
 ![示例图片](https://github.com/weiwait/images/blob/main/dcat-cropper.png?raw=true)
