@@ -1,4 +1,4 @@
-<div x-data="cropper" x-init="_init({{$options}}, '{{$column}}')">
+<div x-data2="weiwait_cropper()" x-init2="_init({{$options}}, '{{$column}}')">
     <div class="{{$viewClass['form-group']}} {{ $class }}">
 
         <label for="{{$column}}" class="{{$viewClass['label']}} control-label">{!! $label !!}</label>

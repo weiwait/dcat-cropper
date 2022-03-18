@@ -535,7 +535,7 @@ ${r ? 'Expression: "' + r + `"
             }
         }
         var ut = "DEFAULT"
-            , Se = ["ignore", "ref", "data", "id", "bind", "init", "for", "model", "modelable", "transition", "show", "if", ut, "teleport", "element"];
+            , Se = ["ignore", "ref", "data2", "id", "bind", "init2", "for", "model", "modelable", "transition", "show", "if", ut, "teleport", "element"];
         function mn(e, t) {
             let r = Se.indexOf(e.type) === -1 ? ut : e.type
                 , n = Se.indexOf(t.type) === -1 ? ut : t.type;
@@ -1122,7 +1122,7 @@ ${r ? 'Expression: "' + r + `"
             t === void 0)
                 return q[e];
             q[e] = t,
-            typeof t == "object" && t !== null && t.hasOwnProperty("init") && typeof t.init == "function" && q[e].init(),
+            typeof t == "object" && t !== null && t.hasOwnProperty("init2") && typeof t.init == "function" && q[e].init(),
                 ye(q[e])
         }
         function yr() {
@@ -1769,7 +1769,7 @@ ${r ? 'Expression: "' + r + `"
             }
         );
         y("store", yr);
-        y("data", e=>xe(e));
+        y("data2", e=>xe(e));
         y("root", e=>V(e));
         y("refs", e=>(e._x_refs_proxy || (e._x_refs_proxy = I(ci(e))),
             e._x_refs_proxy));
@@ -2065,8 +2065,8 @@ ${r ? 'Expression: "' + r + `"
             return !Array.isArray(e) && !isNaN(e)
         }
         p("cloak", e=>queueMicrotask(()=>m(()=>e.removeAttribute(w("cloak")))));
-        Ce(()=>`[${w("init")}]`);
-        p("init", D((e,{expression: t},{evaluate: r})=>typeof t == "string" ? !!t.trim() && r(t, {}, !1) : r(t, {}, !1)));
+        Ce(()=>`[${w("init2")}]`);
+        p("init2", D((e,{expression: t},{evaluate: r})=>typeof t == "string" ? !!t.trim() && r(t, {}, !1) : r(t, {}, !1)));
         p("text", (e,{expression: t},{effect: r, evaluateLater: n})=>{
                 let i = n(t);
                 r(()=>{
@@ -2136,8 +2136,8 @@ ${r ? 'Expression: "' + r + `"
         function xi(e, t) {
             e._x_keyExpression = t
         }
-        Te(()=>`[${w("data")}]`);
-        p("data", D((e,{expression: t},{cleanup: r})=>{
+        Te(()=>`[${w("data2")}]`);
+        p("data2", D((e,{expression: t},{cleanup: r})=>{
                 t = t === "" ? "{}" : t;
                 let n = {};
                 re(n, e);

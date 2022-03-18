@@ -2,6 +2,7 @@
 
 namespace Weiwait\DcatCropper;
 
+use Dcat\Admin\Admin;
 use Dcat\Admin\Extend\ServiceProvider;
 use Dcat\Admin\Form;
 use Weiwait\DcatCropper\Form\Field\Cropper;
@@ -29,6 +30,8 @@ class DcatCropperServiceProvider extends ServiceProvider
 
 		Form::extend('cropper', Cropper::class);
 		Form::extend('multipleCropper', MultipleCropper::class);
+
+		Admin::requireAssets('@weiwait.dcat-cropper');
 
 		$this->publishable();
 
