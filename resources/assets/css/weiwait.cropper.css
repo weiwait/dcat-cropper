@@ -5,15 +5,6 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-bottom: 10px;
-}
-
-.ml-nf-10, .ml-10 {
-    margin-left: 10px;
-}
-
-.ml-nf-10:first-of-type {
-    margin-left: 0!important;
 }
 
 .cropped-img {

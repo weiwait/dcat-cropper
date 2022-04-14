@@ -19,6 +19,8 @@
 
 ```php
     $form->cropper('column', 'label')
+        ->jpeg(0.5) // 0 ~ 1
+        ->useBase64() // 采用base64编码图片统一提交
         ->ratio(16/9) // 快捷裁剪选项配置（裁剪比率）
         ->resolution(1920, 1080)
         ->ratio(1)
@@ -35,6 +37,7 @@
         ])
     
     $form->multipleCropper('column', 'label')
+        ->limit(5) // 默认为框架默认值10
         ->ratio(16/9) // 快捷裁剪选项配置（裁剪比率）
         ->resolution(1920, 1080)
         ->ratio(1)

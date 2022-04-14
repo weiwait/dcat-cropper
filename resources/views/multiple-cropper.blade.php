@@ -8,9 +8,9 @@
 
             <div class="web-uploader clearfix {{ $fileType }}">
 
-                <div style="display: flex; flex-wrap: wrap;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, 190px); justify-content: space-between; gap: 10px;">
                     <template x-for="(img, ii) in images">
-                        <div class="img-thumbnail cropped-img-contain ml-nf-10"
+                        <div class="img-thumbnail cropped-img-contain"
                              draggable="true"
                              x-on:dragover.throttle.500ms="croppedDragover(ii)"
                              x-on:dragstart="currentDrag = ii">
@@ -24,7 +24,7 @@
                         </div>
                     </template>
 
-                    <label id="{{$column}}-img-pick" class="img-thumbnail cropped-img-contain ml-10">
+                    <label id="{{$column}}-img-pick" class="img-thumbnail cropped-img-contain">
                         <div>
                             <span style="font-size: 100px; color: #a6a6a6">+</span>
                         </div>
