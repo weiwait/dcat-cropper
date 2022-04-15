@@ -39,9 +39,9 @@ class Cropper extends Image
 
             $this->callInterventionMethods($this->getStorage()->path($file), '');
 
-            foreach ($storage->files('weiwait/cropper') as $file) {
-                if ($storage->lastModified($file) < time() - 3600 * 24) {
-                    $storage->delete($file);
+            foreach ($storage->files('weiwait/cropper') as $item) {
+                if ($storage->lastModified($item) < time() - 3600 * 24) {
+                    $storage->delete($item);
                 }
             }
         }
