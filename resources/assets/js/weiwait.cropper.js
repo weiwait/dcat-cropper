@@ -39,6 +39,8 @@ function weiwait_cropper() {
         badImg: false,
         http: Object,
         currentFile: File,
+        maxima: false,
+
 
         _init(options, column) {
             this.column = column
@@ -100,8 +102,9 @@ function weiwait_cropper() {
             for (let file of files) {
                 this.currentFile = file
 
-                if (this.value.length >= this.options.fileNumLimit) {
+                if (this.maxima) {
                     Dcat.warning('文件数限制：' + this.options.fileNumLimit)
+                    this.maxima = false
                     this.next()
                     break
                 }
@@ -172,43 +175,34 @@ function weiwait_cropper() {
 
             const type = parseFloat(this.options.quality) > 0 ? 'image/jpeg' : 'image/png';
 
-            if (false !== this.currentIndex) {
-                if (this.options.useBase64) {
-                    const currentImg = this.Cropper.getCroppedCanvas(resolution).toDataURL(type, this.options.quality)
+            if (this.options.useBase64) {
+                const currentImg = this.Cropper.getCroppedCanvas(resolution)
+                    .toDataURL(type, this.options.quality)
 
-                    this.images[this.currentIndex] = currentImg
-                    this.value[this.currentIndex] = currentImg
-
-                    this.next()
-                } else {
-                    this.Cropper.getCroppedCanvas(resolution).toBlob(blob => {
-                        this.http.post(this.options.croppingUrl, {file: blob}).then(res => {
-                            this.images[this.currentIndex] = res.url
-                            this.value[this.currentIndex] = res.name
-
-                            this.next()
-                        })
-                    }, type, this.options.quality)
-                }
+                this.handleCroppingResult(currentImg, currentImg, this.currentIndex)
             } else {
-                if (this.options.useBase64) {
-                    const currentImg = this.Cropper.getCroppedCanvas(resolution).toDataURL(type, this.options.quality)
+                this.Cropper.getCroppedCanvas(resolution).toBlob(blob => {
+                    this.http.post(this.options.croppingUrl, {file: blob}).then(res => {
+                        this.handleCroppingResult(res.url, res.name, this.currentIndex)
+                    })
+                }, type, this.options.quality)
+            }
+        },
 
-                    this.images.push(currentImg)
-                    this.value.push(currentImg)
-
-                    this.next()
+        handleCroppingResult(img, value, index = null) {
+            if ('number' === typeof index) {
+                this.images[index] = img
+                this.value[index] = value
+            } else {
+                if (this.value.length >= this.options.fileNumLimit) {
+                    this.maxima = true
                 } else {
-                    this.Cropper.getCroppedCanvas(resolution).toBlob(blob => {
-                        this.http.post(this.options.croppingUrl, {file: blob}).then(res => {
-                            this.images.push(res.url)
-                            this.value.push(res.name)
-
-                            this.next()
-                        })
-                    }, type, this.options.quality)
+                    this.images.push(img)
+                    this.value.push(value)
                 }
             }
+
+            this.next()
         },
 
         next() {
