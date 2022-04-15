@@ -40,7 +40,7 @@ function weiwait_cropper() {
         http: Object,
         currentFile: File,
         maxima: false,
-
+        is_cropping: false,
 
         _init(options, column) {
             this.column = column
@@ -156,6 +156,8 @@ function weiwait_cropper() {
         },
 
         cropping() {
+            this.is_cropping = true
+
             let resolution = {}
             if (this.options?.resolution) {
                 if (Object.keys(this.ratios).length === 0) {
@@ -209,6 +211,7 @@ function weiwait_cropper() {
             this.modalShow = false
             this.croppingData = false
             this.currentFile = null
+            this.is_cropping = false
 
             if (this.Cropper instanceof Cropper) {
                 this.Cropper.destroy()
@@ -259,6 +262,7 @@ function weiwait_cropper() {
         },
 
         async original() {
+            this.is_cropping = true
             let img = this.croppingData
 
             if (! String(img).startsWith('http') && ! this.options.useBase64 && this.currentFile) {
