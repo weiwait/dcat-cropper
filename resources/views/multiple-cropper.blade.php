@@ -83,9 +83,7 @@
                             原图
                         </button>
 
-                        <button type="button" class="btn btn-info"
-                                x-on:click="cropping()"
-                                x-show="is_cropping">
+                        <button type="button" class="btn btn-info" x-show="is_cropping">
                             <span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
                         </button>
 
@@ -95,9 +93,7 @@
                             裁剪
                         </button>
 
-                        <button type="button" class="btn btn-info"
-                                x-on:click="cropping()"
-                                x-show="is_cropping">
+                        <button type="button" class="btn btn-info" x-show="is_cropping">
                             <span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
                         </button>
                     </div>
