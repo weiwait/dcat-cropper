@@ -1,11 +1,60 @@
-if (!window.weiwait_alpine_loaded) {
+if (! window.weiwait_alpine_loaded) {
+    window.weiwait_alpine_loaded = true
 
     let alpine = document.createElement('script')
     alpine.src = '/vendor/dcat-admin-extensions/weiwait/dcat-cropper/js/weiwait.alpine.js'
     alpine.defer = true
-    document.head.append(alpine)
 
-    window.weiwait_alpine_loaded = true
+    alpine.onerror = () => {
+        window.weiwait_alpine_loaded = false
+        throw new Error('Alpine js 加载失败')
+    }
+
+    document.head.append(alpine)
+}
+
+class CropperImage {
+    id = Number
+    uri = String
+    preview = String
+
+    constructor(uri, preview = null) {
+        this.id = Math.random() * 10000 | 0
+        this.uri = uri
+        this.preview =  preview ? preview : uri
+    }
+}
+
+class CropperHttp {
+    constructor() {
+        this.xml = new XMLHttpRequest()
+    }
+
+    post(url, data = {}) {
+        const fd = new FormData
+        Object.keys(data).forEach(key => {
+            fd.append(key, data[key])
+        })
+
+        return this.send('POST', url, fd)
+    }
+
+    send(method, url, data = null) {
+        return new Promise((resolve => {
+            this.xml.onreadystatechange = () => {
+                if (this.xml.DONE === this.xml.readyState &&  200 === this.xml.status) {
+                    resolve(JSON.parse(this.xml.responseText))
+                }
+            }
+
+            this.xml.open(method, url)
+
+            if (data instanceof FormData) {
+                data.append('_token', Dcat.token)
+            }
+            this.xml.send(data)
+        }))
+    }
 }
 
 function weiwait_cropper() {
@@ -24,7 +73,6 @@ function weiwait_cropper() {
         Cropper: {},
         nextResolve: {},
         images: [],
-        value: [],
         pickInput: '',
         currentIndex: false,
         currentDrag: false,
@@ -39,8 +87,9 @@ function weiwait_cropper() {
         badImg: false,
         http: Object,
         currentFile: File,
-        maxima: false,
         is_cropping: false,
+        croppingImageElement: null,
+        currentCropperImage: CropperImage,
 
         _init(options, column) {
             this.column = column
@@ -48,8 +97,7 @@ function weiwait_cropper() {
 
             if (this.options?.preview?.length > 0) {
                 this.options.preview.forEach(item => {
-                    this.images.push(item.url)
-                    this.value.push(item.id)
+                    this.images.push(new CropperImage(item.id, item.url))
                 })
             }
 
@@ -63,37 +111,7 @@ function weiwait_cropper() {
                 }
             }
 
-            this.http = new class  {
-                constructor() {
-                    this.xml = new XMLHttpRequest()
-                }
-
-                post(url, data = {}) {
-                    const fd = new FormData
-                    Object.keys(data).forEach(key => {
-                        fd.append(key, data[key])
-                    })
-
-                    return this.send('POST', url, fd)
-                }
-
-                send(method, url, data = null) {
-                    return new Promise((resolve => {
-                        this.xml.onreadystatechange = () => {
-                            if (this.xml.DONE === this.xml.readyState &&  200 === this.xml.status) {
-                                resolve(JSON.parse(this.xml.responseText))
-                            }
-                        }
-
-                        this.xml.open(method, url)
-
-                        if (data instanceof FormData) {
-                            data.append('_token', Dcat.token)
-                        }
-                        this.xml.send(data)
-                    }))
-                }
-            }
+            this.croppingImageElement = document.querySelector('#croppingImg-' + this.column)
         },
 
         async selected(e) {
@@ -102,9 +120,8 @@ function weiwait_cropper() {
             for (let file of files) {
                 this.currentFile = file
 
-                if (this.maxima) {
+                if (! this.changing && this.images.length >= this.options.fileNumLimit) {
                     Dcat.warning('文件数限制：' + this.options.fileNumLimit)
-                    this.maxima = false
                     this.next()
                     break
                 }
@@ -114,16 +131,19 @@ function weiwait_cropper() {
                     let reader = new FileReader()
                     reader.readAsDataURL(file)
                     reader.onload = ev => {
+                        const image = new CropperImage(ev.target.result)
+
                         if (this.changing) {
                             if (this.badImg) {
-                                this.prepareCropper(ev.target.result, this.currentIndex)
+                                this.prepareCropper(image, this.currentIndex)
                             } else {
-                                this.Cropper.replace(ev.target.result)
+                                this.currentCropperImage = image
+                                this.Cropper.replace(image.preview)
                             }
                             this.changing = false
                             this.multiple = true
                         } else {
-                            this.prepareCropper(ev.target.result)
+                            this.prepareCropper(image)
                         }
                     }
                 })
@@ -132,22 +152,21 @@ function weiwait_cropper() {
             this.pickInput = '';
         },
 
-        prepareCropper(imgData, index = false) {
-            this.currentIndex = index
-            this.croppingData = imgData
-            this.modalShow = true
-
-            let img = document.querySelector('#croppingImg-' + this.column)
-
+        prepareCropper(cropperImage, index = false) {
             new Promise((resolve, reject) => {
-                img.onload = () => resolve()
-                img.onerror = () => reject()
+                this.croppingImageElement.onload = () => resolve()
+                this.croppingImageElement.onerror = () => reject()
+
+                this.currentCropperImage = cropperImage
+                this.currentIndex = index
+                this.croppingData = cropperImage.preview
+                this.modalShow = true
             }).then(() => {
                 if (this.Cropper instanceof Cropper) {
                     this.Cropper.destroy()
                 }
 
-                this.Cropper = new Cropper(img, {
+                this.Cropper = new Cropper(this.croppingImageElement, {
                     aspectRatio: this.aspectRatio
                 });
             }).catch(() => {
@@ -157,7 +176,37 @@ function weiwait_cropper() {
 
         cropping() {
             this.is_cropping = true
+            const resolution = this.resolveResolution()
 
+            const type = parseFloat(this.options.quality) > 0 ? 'image/jpeg' : 'image/png';
+
+            const croppedDataUrl = this.Cropper.getCroppedCanvas(resolution).toDataURL(type, this.options.quality)
+
+            const image = new CropperImage(croppedDataUrl, croppedDataUrl)
+            this.currentCropperImage = image
+
+            if ('number' === typeof this.currentIndex) {
+                this.images[this.currentIndex] = image
+            } else {
+                this.currentIndex = this.images.push(image) - 1
+            }
+
+            if (! this.options.useBase64) {
+                ((id, type, quality) => {
+                    this.Cropper.getCroppedCanvas(resolution).toBlob(blob => {
+                        new CropperHttp().post(this.options.croppingUrl, {file: blob}).then(res => {
+                            const i = this.images.findIndex(item => item.id === id)
+
+                            this.images[i] = new CropperImage(res.name, res.url)
+                        })
+                    }, type, quality)
+                })(image.id, type, this.options.quality)
+            }
+
+            this.next()
+        },
+
+        resolveResolution() {
             let resolution = {}
             if (this.options?.resolution) {
                 if (Object.keys(this.ratios).length === 0) {
@@ -175,36 +224,7 @@ function weiwait_cropper() {
                 }
             }
 
-            const type = parseFloat(this.options.quality) > 0 ? 'image/jpeg' : 'image/png';
-
-            if (this.options.useBase64) {
-                const currentImg = this.Cropper.getCroppedCanvas(resolution)
-                    .toDataURL(type, this.options.quality)
-
-                this.handleCroppingResult(currentImg, currentImg, this.currentIndex)
-            } else {
-                this.Cropper.getCroppedCanvas(resolution).toBlob(blob => {
-                    this.http.post(this.options.croppingUrl, {file: blob}).then(res => {
-                        this.handleCroppingResult(res.url, res.name, this.currentIndex)
-                    })
-                }, type, this.options.quality)
-            }
-        },
-
-        handleCroppingResult(img, value, index = null) {
-            if ('number' === typeof index) {
-                this.images[index] = img
-                this.value[index] = value
-            } else {
-                if (this.value.length >= this.options.fileNumLimit) {
-                    this.maxima = true
-                } else {
-                    this.images.push(img)
-                    this.value.push(value)
-                }
-            }
-
-            this.next()
+            return resolution
         },
 
         next() {
@@ -227,15 +247,11 @@ function weiwait_cropper() {
             let current = this.images.splice(this.currentDrag, 1)
             this.images.splice(index, 0, ...current)
 
-            let currentValue = this.value.splice(this.currentDrag, 1)
-            this.value.splice(index, 0, ...currentValue)
-
             this.currentDrag = index
         },
 
         deleteCropped() {
             this.images.splice(this.currentIndex, 1)
-            this.value.splice(this.currentIndex, 1)
             this.modalShow = false
         },
 
@@ -263,31 +279,24 @@ function weiwait_cropper() {
 
         async original() {
             this.is_cropping = true
-            let img = this.croppingData
 
-            if (! String(img).startsWith('http') && ! this.options.useBase64 && this.currentFile) {
-                await this.http.post(this.options.croppingUrl, {file: this.currentFile}).then(res => {
-                    if (false !== this.currentIndex) {
-                        this.images[this.currentIndex] = res.url
-                        this.value[this.currentIndex] = res.name
-                    } else {
-                        this.images.push(res.url)
-                        this.value.push(res.name)
-                    }
-
-                    this.next()
-                })
+            if (false !== this.currentIndex) {
+                this.images[this.currentIndex] = this.currentCropperImage
             } else {
-                if (false !== this.currentIndex) {
-                    this.images[this.currentIndex] = img
-                    this.value[this.currentIndex] = img
-                } else {
-                    this.images.push(img)
-                    this.value.push(img)
-                }
-
-                this.next()
+                this.currentIndex = this.images.push(this.currentCropperImage) - 1
             }
+
+            if (! this.options.useBase64 && this.currentFile) {
+                ((id, file) => {
+                    new CropperHttp().post(this.options.croppingUrl, {file}).then(res => {
+                        const i = this.images.findIndex(item => item.id === id)
+
+                        this.images[i] = new CropperImage(res.name, res.url)
+                    })
+                })(this.currentCropperImage.id, this.currentFile)
+            }
+
+            this.next()
         },
 
         changeMode(mode) {

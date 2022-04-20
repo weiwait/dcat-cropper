@@ -9,22 +9,22 @@
             <div class="web-uploader clearfix {{ $fileType }}">
 
                 <div style="display: flex; flex-wrap: wrap;">
-                    <template x-for="(img, ii) in images">
+                    <template x-for="(image, ii) in images">
                         <div class="img-thumbnail cropped-img-contain"
                              draggable="true"
                              x-on:dragover.throttle.500ms="croppedDragover(ii)"
                              x-on:dragstart="currentDrag = ii">
 
-                            <img x-bind:src="img"
+                            <img x-bind:src="image.preview"
                                  class="cropped-img"
-                                 x-on:click="prepareCropper($event.target.src, ii)"
+                                 x-on:click="prepareCropper(image, ii)"
                                  draggable="false">
 
-                            <input name="{{ $name }}" x-bind:value="value[ii]" type="hidden"/>
+                            <input name="{{ $name }}" x-bind:value="image.uri" type="hidden"/>
                         </div>
                     </template>
 
-                    <label x-show="value.length < 1" id="{{$column}}-img-pick" class="img-thumbnail cropped-img-contain">
+                    <label x-show="images.length < 1" id="{{$column}}-img-pick" class="img-thumbnail cropped-img-contain">
                         <div>
                             <span style="font-size: 100px; color: #a6a6a6">+</span>
                         </div>
