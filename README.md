@@ -63,7 +63,7 @@
 [comment]: <> (![示例图片]&#40;https://github.com/weiwait/images/blob/main/donate.png?raw=true&#41;)
 
 ### Dcat-admin 扩展列表
-1. [单图裁剪](https://github.com/weiwait/dcat-cropper)
+1. [新版裁剪](https://github.com/weiwait/dcat-vue)
 2. [区划级联+坐标拾取](https://github.com/weiwait/dcat-distpicker)
 3. [smtp快速便捷配置](https://github.com/weiwait/dcat-smtp)
 4. [sms channel 快速便捷配置](https://github.com/weiwait/dcat-easy-sms)
